@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbinventory-config
+data:
+  DEBUG: "0"
+  DJANGO_ALLOWED_HOSTS: "localhost dbapp dbinventory-npd.socan.can"
+  SQL_DATABASE: "dbinventory"
+  SQL_USER: "dbinventoryuser"
+  SQL_HOST: "dbinventorydb"
+  SQL_PORT: "5432"

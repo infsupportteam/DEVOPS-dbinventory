@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbinventory-front
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: dbinventory-front
+
+  template:
+    metadata:
+      labels:
+        app: dbinventory-front
+
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-regcred
+
+      containers:
+        - name: front
+          image: devops-dbinventory-front
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 3000

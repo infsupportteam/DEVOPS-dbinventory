@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dbinventorydb
+spec:
+  serviceName: dbinventorydb
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: dbinventorydb
+
+  template:
+    metadata:
+      labels:
+        app: dbinventorydb
+
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+
+          env:
+            - name: POSTGRES_DB
+              value: dbinventory
+
+            - name: POSTGRES_USER
+              value: dbinventoryuser
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbinventory-secret
+                  key: SQL_PASSWORD
+
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          ports:
+            - containerPort: 5432
+
+          volumeMounts:
+            - name: dbinventorydb-data
+              mountPath: /var/lib/postgresql/data
+
+      volumes:
+        - name: dbinventorydb-data
+          persistentVolumeClaim:
+            claimName: dbinventorydb-data

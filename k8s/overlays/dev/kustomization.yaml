@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dbinventory
+
+resources:
+  - namespace.yaml
+  - ../../base/dbinventory
+
+images:
+  - name: devops-dbinventory-dbapp
+    newName: socaninfsupport/private
+    newTag: dbapp-develop
+
+  - name: devops-dbinventory-front
+    newName: socaninfsupport/private
+    newTag: dbinventory-front-develop
+
+patches:
+  - path: patches/pvc-patch.yaml

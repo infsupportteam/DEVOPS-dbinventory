@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dbinventory
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: dbinventory-npd.socan.can
+      http:
+        paths:
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: dbapp
+                port:
+                  number: 8000
+
+          - path: /admin/
+            pathType: Prefix
+            backend:
+              service:
+                name: dbapp
+                port:
+                  number: 8000
+
+          - path: /static/
+            pathType: Prefix
+            backend:
+              service:
+                name: dbapp
+                port:
+                  number: 8000
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dbinventory-front
+                port:
+                  number: 3000
