@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Count, Q
 from rest_framework import filters, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -10,6 +10,50 @@ from .serializers import CustomFieldDefinitionSerializer, DatabaseAssetSerialize
 @api_view(["GET"])
 def health(request):
     return Response({"status": "ok", "service": "dbinventory"})
+
+
+def _count_by(queryset, field_name):
+    rows = (
+        queryset.values(field_name)
+        .annotate(count=Count("id"))
+        .order_by("-count", field_name)
+    )
+    result = {}
+    for row in rows:
+        key = row[field_name] or "Unspecified"
+        result[key] = row["count"]
+    return result
+
+
+@api_view(["GET"])
+def summary(request):
+    queryset = DatabaseAsset.objects.all()
+
+    production_filter = (
+        Q(environment__iexact="production")
+        | Q(environment__iexact="prod")
+        | Q(environment__iexact="prd")
+    )
+    active_filter = Q(status__iexact="active") | Q(status__iexact="in use")
+
+    total = queryset.count()
+    production = queryset.filter(production_filter).count()
+    unspecified_environment = queryset.filter(environment="").count()
+    non_production = queryset.exclude(production_filter).exclude(environment="").count()
+    active = queryset.filter(active_filter).count()
+
+    return Response(
+        {
+            "total": total,
+            "production": production,
+            "non_production": non_production,
+            "unspecified_environment": unspecified_environment,
+            "active": active,
+            "by_asset_type": _count_by(queryset, "asset_type"),
+            "by_environment": _count_by(queryset, "environment"),
+            "by_status": _count_by(queryset, "status"),
+        }
+    )
 
 
 class DatabaseAssetViewSet(viewsets.ModelViewSet):
@@ -44,6 +88,7 @@ class DatabaseAssetViewSet(viewsets.ModelViewSet):
                 | Q(ip_address__icontains=search)
                 | Q(application__icontains=search)
                 | Q(dbms__icontains=search)
+                | Q(version__icontains=search)
             )
 
         if asset_type:

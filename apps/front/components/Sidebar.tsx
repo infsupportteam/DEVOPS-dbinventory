@@ -4,7 +4,9 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="socan">SOCAN</div>
+        <div className="socan">
+          SO<span className="socanC">C</span>AN
+        </div>
         <div className="brandSubtitle">DATABASE INVENTORY</div>
       </div>
 
