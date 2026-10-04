@@ -36,5 +36,9 @@ spec:
               drop:
                 - ALL
 
+          env:
+            - name: HOSTNAME
+              value: "0.0.0.0"
+
           ports:
             - containerPort: 3000
